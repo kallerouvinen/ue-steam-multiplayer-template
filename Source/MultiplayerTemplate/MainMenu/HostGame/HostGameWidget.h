@@ -14,6 +14,7 @@ class UTextBlock;
 UENUM()
 enum class ESessionVisibility : uint8
 {
+	Public,
 	FriendsCanJoin,
 	InviteOnly,
 };

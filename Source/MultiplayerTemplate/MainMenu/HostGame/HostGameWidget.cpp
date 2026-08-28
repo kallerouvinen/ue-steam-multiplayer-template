@@ -71,10 +71,11 @@ ESessionVisibility UHostGameWidget::GetSelectedSessionVisibility() const
 	switch (SessionVisibilitySelector->GetSelectedIndex())
 	{
 		case 0:
-			return ESessionVisibility::FriendsCanJoin;
+			return ESessionVisibility::Public;
 		case 1:
-			return ESessionVisibility::InviteOnly;
-		default:
 			return ESessionVisibility::FriendsCanJoin;
+		case 2:
+		default:
+			return ESessionVisibility::InviteOnly;
 	}
 }
