@@ -1,7 +1,6 @@
 // Copyright 2026 Kalle Rouvinen. All Rights Reserved.
 
 #include "MultiplayerTemplate/Character/MultiplayerTemplateCharacter.h"
-// #include "MultiplayerTemplate/MultiplayerTemplate.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/LocalPlayer.h"
