@@ -16,7 +16,6 @@ public class MultiplayerTemplate : ModuleRules
 			"EnhancedInput",
 			"AIModule",
 			"StateTreeModule",
-			"GameplayStateTreeModule",
 			"UMG",
 			"Slate"
 		});

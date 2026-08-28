@@ -42,8 +42,6 @@ protected:
 	TObjectPtr<UInputAction> MoveAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> MouseLookAction;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

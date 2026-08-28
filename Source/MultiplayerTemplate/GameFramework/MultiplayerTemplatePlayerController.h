@@ -6,17 +6,31 @@
 #include "GameFramework/PlayerController.h"
 #include "MultiplayerTemplatePlayerController.generated.h"
 
-// class UInputMappingContext;
+class UInputAction;
+class UInputMappingContext;
+class UPauseMenu;
 
 UCLASS()
 class AMultiplayerTemplatePlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	AMultiplayerTemplatePlayerController();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
-	// UPROPERTY(EditAnywhere, Category = "Input|Input Mappings")
-	// TArray<UInputMappingContext*> DefaultMappingContexts;
+public:
+	void TogglePauseMenu();
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Input|Input Mappings")
+	TObjectPtr<UInputMappingContext> MappingContext;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> TogglePauseMenuAction;
+
+	TSubclassOf<UPauseMenu> PauseMenuClass;
+	TObjectPtr<UPauseMenu> PauseMenu;
 };

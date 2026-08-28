@@ -54,23 +54,22 @@ AMultiplayerTemplateCharacter::AMultiplayerTemplateCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
 
-	ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
+	ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("InputMappingContext'/Game/Input/IMC_Character.IMC_Character'"));
 	if (MappingContextFinder.Succeeded())
 	{
 		MappingContext = MappingContextFinder.Object;
 	}
-
-	ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("InputAction'/Game/Input/Actions/IA_Jump.IA_Jump'"));
+	ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("InputAction'/Game/Input/Character/IA_Jump.IA_Jump'"));
 	if (JumpActionFinder.Succeeded())
 	{
 		JumpAction = JumpActionFinder.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
+	ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("InputAction'/Game/Input/Character/IA_Look.IA_Look'"));
 	if (LookActionFinder.Succeeded())
 	{
 		LookAction = LookActionFinder.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UInputAction> MoveActionFinder(TEXT("InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
+	ConstructorHelpers::FObjectFinder<UInputAction> MoveActionFinder(TEXT("InputAction'/Game/Input/Character/IA_Move.IA_Move'"));
 	if (MoveActionFinder.Succeeded())
 	{
 		MoveAction = MoveActionFinder.Object;
