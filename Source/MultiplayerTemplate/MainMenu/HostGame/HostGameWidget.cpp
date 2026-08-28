@@ -9,11 +9,6 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
-UHostGameWidget::UHostGameWidget(const FObjectInitializer& ObjectInitializer)
-		: Super(ObjectInitializer)
-{
-}
-
 void UHostGameWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -45,12 +40,8 @@ void UHostGameWidget::OnStartGameButtonClicked()
 {
 	ESessionVisibility SessionVisibility = GetSelectedSessionVisibility();
 
-	// TODO: Remove if not needed
-	// USaveGameSubsystem& SaveGameSubsystem = USaveGameSubsystem::Get(this);
-	// SaveGameSubsystem.SetPendingLoadSlotName("");
-
-	// TODO: Is this needed?
-	// UGameplayStatics::OpenLevel(GetWorld(), MAP_NAME);
+	// TODO: Remove once opening level happens in session hosting
+	UGameplayStatics::OpenLevel(GetWorld(), GAME_MAP_PATH);
 
 	if (UMultiplayerTemplateGameInstance* GameInstance = GetGameInstance<UMultiplayerTemplateGameInstance>())
 	{

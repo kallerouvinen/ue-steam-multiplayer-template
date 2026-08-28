@@ -2,7 +2,6 @@
 
 #include "MultiplayerTemplate/MainMenu/JoinGame/JoinGameWidget.h"
 #include "MultiplayerTemplate/GameFramework/MultiplayerTemplateGameInstance.h"
-// #include "MultiplayerTemplate/Libraries/PaintersGameplayTags.h"
 #include "MultiplayerTemplate/MainMenu/JoinGame/SessionData.h"
 #include "Components/Button.h"
 #include "Components/CircularThrobber.h"

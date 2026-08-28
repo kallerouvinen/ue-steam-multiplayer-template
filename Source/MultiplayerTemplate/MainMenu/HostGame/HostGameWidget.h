@@ -27,9 +27,6 @@ class UHostGameWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
-	UHostGameWidget(const FObjectInitializer& ObjectInitializer);
-
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
