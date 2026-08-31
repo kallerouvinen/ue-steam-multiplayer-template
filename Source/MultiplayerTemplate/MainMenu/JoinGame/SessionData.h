@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "FindSessionsCallbackProxy.h"
+#include "OnlineSessionSettings.h"
 #include "UObject/NoExportTypes.h"
 #include "SessionData.generated.h"
 
@@ -15,10 +15,10 @@ class USessionData : public UObject
 {
 	GENERATED_BODY()
 
-// public:
-// 	void SetSessionResult(const FBlueprintSessionResult& InSessionResult) { SessionResult = InSessionResult; }
-// 	FBlueprintSessionResult GetSessionResult() const { return SessionResult; }
+public:
+	void SetSearchResult(const FOnlineSessionSearchResult& InSearchResult) { SearchResult = InSearchResult; }
+	FOnlineSessionSearchResult GetSearchResult() const { return SearchResult; }
 
-// private:
-// 	FBlueprintSessionResult SessionResult;
+private:
+	FOnlineSessionSearchResult SearchResult;
 };

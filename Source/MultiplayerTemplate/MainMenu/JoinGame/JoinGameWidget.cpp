@@ -1,8 +1,9 @@
 // Copyright 2026 Kalle Rouvinen. All Rights Reserved.
 
 #include "MultiplayerTemplate/MainMenu/JoinGame/JoinGameWidget.h"
-#include "MultiplayerTemplate/GameFramework/MultiplayerTemplateGameInstance.h"
+#include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/MainMenu/JoinGame/SessionData.h"
+// #include "OnlineSessionSettings.h"
 #include "Components/Button.h"
 #include "Components/CircularThrobber.h"
 #include "Components/ListView.h"
@@ -27,24 +28,26 @@ void UJoinGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	// FindSessionsSuccessListenerHandle = MessageSubsystem.RegisterListener(
-	// 		PaintersTags::TAG_Message_FindSessionsSuccess,
-	// 		this,
-	// 		&ThisClass::OnFindSessionsSuccess);
-	// FindSessionsFailureListenerHandle = MessageSubsystem.RegisterListener(
-	// 		PaintersTags::TAG_Message_FindSessionsFailure,
-	// 		this,
-	// 		&ThisClass::OnFindSessionsFailure);
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance) return;
+
+	USteamMultiplayerSubsystem* Subsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>();
+	if (!Subsystem) return;
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("SteamMultiplayerSubsystem found and bound to OnFindSessionsCompleted"), false);
+
+	Subsystem->OnFindSessionsCompleted.AddDynamic(this, &ThisClass::OnFindSessionsCompleted);
 
 	OnRefreshButtonClicked();
 }
 
 void UJoinGameWidget::NativeDestruct()
 {
-	// UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	// MessageSubsystem.UnregisterListener(FindSessionsSuccessListenerHandle);
-	// MessageSubsystem.UnregisterListener(FindSessionsFailureListenerHandle);
+	USteamMultiplayerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<USteamMultiplayerSubsystem>();
+	if (Subsystem)
+	{
+		Subsystem->OnFindSessionsCompleted.RemoveAll(this);
+	}
 
 	Super::NativeDestruct();
 }
@@ -58,17 +61,22 @@ void UJoinGameWidget::OnSessionSelectionChanged(UObject* ListItemObject)
 
 void UJoinGameWidget::OnJoinButtonClicked()
 {
-	if (UMultiplayerTemplateGameInstance* GameInstance = GetGameInstance<UMultiplayerTemplateGameInstance>())
-	{
-		// if (USessionData* Session = SessionList->GetSelectedItem<USessionData>())
-		// {
-		// 	FBlueprintSessionResult SessionResult = Session->GetSessionResult();
-		// 	if (SessionResult.OnlineResult.IsValid())
-		// 	{
-		// 		GameInstance->JoinSessionEvent(SessionResult);
-		// 	}
-		// }
-	}
+	UGameInstance* GameInstance = GetGameInstance();
+	if (!GameInstance) return;
+
+	USteamMultiplayerSubsystem* Subsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>();
+	if (!Subsystem) return;
+
+	ULocalPlayer* LocalPlayer = GetOwningPlayer()->GetLocalPlayer();
+	if (!LocalPlayer) return;
+
+	USessionData* Session = SessionList->GetSelectedItem<USessionData>();
+	if (!Session) return;
+
+	FOnlineSessionSearchResult SessionResult = Session->GetSearchResult();
+	if (!SessionResult.IsValid()) return;
+
+	Subsystem->JoinSession(LocalPlayer, SessionResult);
 }
 
 void UJoinGameWidget::OnRefreshButtonClicked()
@@ -78,10 +86,13 @@ void UJoinGameWidget::OnRefreshButtonClicked()
 	JoinButton->SetIsEnabled(false);
 	RefreshButton->SetIsEnabled(false);
 
-	// if (UMultiplayerTemplateGameInstance* GameInstance = GetGameInstance<UMultiplayerTemplateGameInstance>())
-	// {
-	// 	GameInstance->FindSessions();
-	// }
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (USteamMultiplayerSubsystem* Subsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
+		{
+			Subsystem->FindSessions();
+		}
+	}
 }
 
 void UJoinGameWidget::OnBackButtonClicked()
@@ -89,33 +100,32 @@ void UJoinGameWidget::OnBackButtonClicked()
 	RemoveFromParent();
 }
 
-// void UJoinGameWidget::OnFindSessionsSuccess(FGameplayTag Channel, const FFindSessionsSuccessMessage& Message)
-// {
-// 	// TODO: Show Message.Results.Num() somewhere in the window
+void UJoinGameWidget::OnFindSessionsCompleted(TArray<USessionData*> SessionData)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("OnFindSessionsCompleted called"));
+	UE_LOG(LogTemp, Warning, TEXT("OnFindSessionsCompleted called"));
+	// TODO: Handle failures also and inform the user that the session search failed
 
-// 	Loader->SetVisibility(ESlateVisibility::Collapsed);
-// 	// JoinButton->SetIsEnabled(true);
-// 	RefreshButton->SetIsEnabled(true);
+	// TODO: Show Message.Results.Num() somewhere in the window
 
-// 	TArray<USessionData*> Sessions;
+	Loader->SetVisibility(ESlateVisibility::Collapsed);
+	// JoinButton->SetIsEnabled(true);
+	RefreshButton->SetIsEnabled(true);
 
-// 	for (const FBlueprintSessionResult& Session : Message.Results)
-// 	{
-// 		if (Session.OnlineResult.IsValid())
-// 		{
-// 			USessionData* SessionData = NewObject<USessionData>();
-// 			SessionData->SetSessionResult(Session);
-// 			Sessions.Add(SessionData);
-// 		}
-// 	}
+	// TArray<USessionData*> Sessions;
 
-// 	SessionList->SetListItems(Sessions);
-// }
+	// for (const USessionData* Session : SessionData)
+	// {
+	// 	if (Session->GetSearchResult().IsValid())
+	// 	{
+	// // void SetSearchResult(const FOnlineSessionSearchResult& InSearchResult) { SearchResult = InSearchResult; }
+	// // FOnlineSessionSearchResult GetSearchResult() const { return SearchResult; }
 
-// void UJoinGameWidget::OnFindSessionsFailure(FGameplayTag Channel, const FGenericMessage& Message)
-// {
-// 	// TODO: Inform the user that the session search failed
+	// 		USessionData* NewSessionData = NewObject<USessionData>();
+	// 		NewSessionData->SetSearchResult(Session);
+	// 		Sessions.Add(NewSessionData);
+	// 	}
+	// }
 
-// 	Loader->SetVisibility(ESlateVisibility::Collapsed);
-// 	RefreshButton->SetIsEnabled(true);
-// }
+	SessionList->SetListItems(SessionData);
+}

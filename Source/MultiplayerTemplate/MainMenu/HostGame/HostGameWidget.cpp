@@ -3,6 +3,7 @@
 #include "MultiplayerTemplate/MainMenu/HostGame/HostGameWidget.h"
 #include "MultiplayerTemplate/Constants.h"
 #include "MultiplayerTemplate/GameFramework/MultiplayerTemplateGameInstance.h"
+#include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/MainMenu/HostGame/CarouselSelector.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
@@ -40,16 +41,24 @@ void UHostGameWidget::OnStartGameButtonClicked()
 {
 	ESessionVisibility SessionVisibility = GetSelectedSessionVisibility();
 
-	// TODO: Remove once opening level happens in session hosting
-	UGameplayStatics::OpenLevel(GetWorld(), GAME_MAP_PATH);
+	// UGameplayStatics::OpenLevel(this, FName(TEXT("DefaultMap")));
 
-	if (UMultiplayerTemplateGameInstance* GameInstance = GetGameInstance<UMultiplayerTemplateGameInstance>())
+	if (UGameInstance* GameInstance = GetGameInstance())
 	{
-		// TArray<FSessionPropertyKeyPair> Settings;
-		// Settings.Add(FSessionPropertyKeyPair{ SESSION_NAME_SETTINGS_KEY, FVariantData(GameNameInput->GetText().ToString()) });
-
-		// GameInstance->CreateSession(Settings);
+		if (USteamMultiplayerSubsystem* SteamMPSubsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
+		{
+			// TODO: Use session settings as parameters
+			SteamMPSubsystem->HostSession(GameNameInput->GetText().ToString());
+		}
 	}
+
+	// if (UMultiplayerTemplateGameInstance* GameInstance = GetGameInstance<UMultiplayerTemplateGameInstance>())
+	// {
+	// 	// TArray<FSessionPropertyKeyPair> Settings;
+	// 	// Settings.Add(FSessionPropertyKeyPair{ SESSION_NAME_SETTINGS_KEY, FVariantData(GameNameInput->GetText().ToString()) });
+
+	// 	// GameInstance->CreateSession(Settings);
+	// }
 }
 
 void UHostGameWidget::OnBackButtonClicked()

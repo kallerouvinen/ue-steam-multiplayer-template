@@ -3,15 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "MultiplayerTemplate/Messages/FindSessionsSuccessMessage.h"
-// #include "MultiplayerTemplate/Messages/GenericMessage.h"
 #include "Blueprint/UserWidget.h"
-// #include "GameFramework/GameplayMessageSubsystem.h"
 #include "JoinGameWidget.generated.h"
 
 class UButton;
 class UCircularThrobber;
 class UListView;
+class USessionData;
 
 /**
  *
@@ -50,11 +48,6 @@ private:
 	UFUNCTION()
 	void OnBackButtonClicked();
 
-	// void OnFindSessionsSuccess(FGameplayTag Channel, const FFindSessionsSuccessMessage& Message);
-	// FGameplayMessageListenerHandle FindSessionsSuccessListenerHandle;
-
-	// void OnFindSessionsFailure(FGameplayTag Channel, const FGenericMessage& Message);
-	// FGameplayMessageListenerHandle FindSessionsFailureListenerHandle;
-
-	// FBlueprintSessionResult SelectedSession;
+	UFUNCTION()
+	void OnFindSessionsCompleted(TArray<USessionData*> SessionData);
 };

@@ -8,20 +8,28 @@ public class MultiplayerTemplate : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		// TODO: Remove redundant modules from the dependency list
-		PublicDependencyModuleNames.AddRange(new string[] {
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
 			"Core",
 			"CoreUObject",
-			"Engine",
-			"InputCore",
-			"EnhancedInput",
-			"AIModule",
-			"StateTreeModule",
-			"UMG",
-			"Slate"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		// TODO: Remove redundant modules from the dependency list
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"AIModule",
+			"Engine",
+			"EnhancedInput",
+			"InputCore",
+			"OnlineSubsystem",
+			// "OnlineSubsystemUtils",
+			"Slate",
+			"StateTreeModule",
+			// "SteamSockets",
+			"UMG",
+		});
+
+		DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 
 		PublicIncludePaths.AddRange(new string[] {
 			"MultiplayerTemplate",
