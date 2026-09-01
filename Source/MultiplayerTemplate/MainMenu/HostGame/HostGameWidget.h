@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MultiplayerTemplate/GameFramework/Enums.h"
 #include "Blueprint/UserWidget.h"
 #include "HostGameWidget.generated.h"
 
@@ -10,14 +11,6 @@ class UButton;
 class UCarouselSelector;
 class UEditableText;
 class UTextBlock;
-
-UENUM()
-enum class ESessionVisibility : uint8
-{
-	Public,
-	FriendsCanJoin,
-	InviteOnly,
-};
 
 /**
  *

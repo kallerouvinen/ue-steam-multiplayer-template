@@ -39,14 +39,14 @@ void UHostGameWidget::OnGameNameTextChanged(const FText& Text)
 
 void UHostGameWidget::OnStartGameButtonClicked()
 {
-	ESessionVisibility SessionVisibility = GetSelectedSessionVisibility();
-
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
 		if (USteamMultiplayerSubsystem* SteamMPSubsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
 		{
 			// TODO: Use session settings as parameters
-			SteamMPSubsystem->HostSession(GameNameInput->GetText().ToString());
+			SteamMPSubsystem->HostSession(
+					GameNameInput->GetText().ToString(),
+					GetSelectedSessionVisibility());
 		}
 	}
 }
@@ -63,7 +63,7 @@ ESessionVisibility UHostGameWidget::GetSelectedSessionVisibility() const
 		case 0:
 			return ESessionVisibility::Public;
 		case 1:
-			return ESessionVisibility::FriendsCanJoin;
+			return ESessionVisibility::FriendsOnly;
 		case 2:
 		default:
 			return ESessionVisibility::InviteOnly;

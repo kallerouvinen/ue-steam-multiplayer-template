@@ -3,6 +3,7 @@
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/Constants.h"
 #include "MultiplayerTemplate/GameFramework/SessionData.h"
+#include "Interfaces/OnlineExternalUIInterface.h"
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
@@ -25,12 +26,14 @@ void USteamMultiplayerSubsystem::Initialize(FSubsystemCollectionBase& Collection
 	}
 }
 
-void USteamMultiplayerSubsystem::HostSession(FString SessionName)
+void USteamMultiplayerSubsystem::HostSession(FString SessionName, ESessionVisibility Visibility)
 {
 	DesiredSessionName = SessionName;
+	DesiredSessionVisibility = Visibility;
 
 	if (SessionInterface.IsValid())
 	{
+		// NOTE: If there is an existing session, it must be destroyed before creating a new one.
 		FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
 
 		if (ExistingSession)
@@ -40,7 +43,7 @@ void USteamMultiplayerSubsystem::HostSession(FString SessionName)
 		}
 		else
 		{
-			CreateSession(DesiredSessionName);
+			CreateSession();
 		}
 	}
 }
@@ -52,7 +55,6 @@ void USteamMultiplayerSubsystem::FindSessions()
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	if (SessionSearch.IsValid())
 	{
-		// SessionSearch->bIsLanQuery = true;
 		SessionSearch->MaxSearchResults = 1000;
 		// SessionSearch->QuerySettings.Set(SEARCH_KEYWORDS, FString(""), EOnlineComparisonOp::Equals);
 		// Examples of setting search parameters
@@ -72,8 +74,6 @@ bool USteamMultiplayerSubsystem::JoinSession(ULocalPlayer* LocalPlayer, const FO
 	if (!LocalPlayer) return false;
 
 	const int32 LocalUserNum = LocalPlayer->GetControllerId();
-	FString JoinSessionString = FString::Printf(TEXT("Player ID %d attempting to join session"), LocalUserNum);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, JoinSessionString, false);
 	return SessionInterface->JoinSession(LocalUserNum, NAME_GameSession, SearchResult);
 }
 
@@ -91,21 +91,26 @@ bool USteamMultiplayerSubsystem::LeaveSession()
 	return false;
 }
 
-void USteamMultiplayerSubsystem::CreateSession(FString SessionName)
+void USteamMultiplayerSubsystem::ShowInviteUI()
+{
+	if (IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get())
+	{
+		IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
+
+		if (ExternalUI.IsValid())
+		{
+			ExternalUI->ShowInviteUI(0, NAME_GameSession);
+		}
+	}
+}
+
+void USteamMultiplayerSubsystem::CreateSession()
 {
 	if (SessionInterface.IsValid())
 	{
-		FOnlineSessionSettings SessionSettings;
-		SessionSettings.bAllowJoinInProgress = true;
-		SessionSettings.bAllowJoinViaPresence = true;
-		// SessionSettings.bIsLANMatch = false;
-		SessionSettings.bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
-		SessionSettings.NumPrivateConnections = 0;
-		SessionSettings.NumPublicConnections = 4;
-		SessionSettings.bShouldAdvertise = true;
-		// In Steam, bUsesPresence and bUseLobbiesIfAvailable have equivalent meaning and should have the same value
-		SessionSettings.bUsesPresence = true;
-		SessionSettings.bUseLobbiesIfAvailable = true;
+		FOnlineSessionSettings SessionSettings = MakeSessionSettings(
+				DesiredSessionVisibility,
+				4);
 
 		if (!DesiredSessionName.IsEmpty())
 		{
@@ -115,19 +120,54 @@ void USteamMultiplayerSubsystem::CreateSession(FString SessionName)
 					EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 		}
 
-		// TODO: We could also use UserId as the first param
+		// TODO: Should we use UserId as the first param?
 		if (!SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings))
 		{
-			// OnCreateSessionComplete.Broadcast(false);
+			OnCreateSessionComplete(NAME_GameSession, false);
 		}
 	}
 }
 
+FOnlineSessionSettings USteamMultiplayerSubsystem::MakeSessionSettings(ESessionVisibility Visibility, int32 MaxPlayers)
+{
+	FOnlineSessionSettings Settings;
+
+	Settings.NumPublicConnections = MaxPlayers;
+	Settings.NumPrivateConnections = 0;
+	Settings.bIsLANMatch = false;
+	Settings.bIsDedicated = false;
+	// NOTE: In Steam, bUsesPresence and bUseLobbiesIfAvailable have
+	// equivalent meaning and should have the same value
+	Settings.bUsesPresence = true;
+	Settings.bUseLobbiesIfAvailable = true;
+	Settings.bAllowJoinInProgress = true;
+	Settings.bAllowInvites = true;
+	Settings.bShouldAdvertise = true;
+
+	switch (Visibility)
+	{
+		case ESessionVisibility::Public:
+			Settings.bAllowJoinViaPresence = true;
+			break;
+		case ESessionVisibility::FriendsOnly:
+			Settings.bAllowJoinViaPresenceFriendsOnly = true;
+			break;
+		case ESessionVisibility::InviteOnly:
+		default:
+			Settings.bAllowJoinViaPresence = false;
+			break;
+	}
+
+	return Settings;
+}
+
 void USteamMultiplayerSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
-	if (!bWasSuccessful) return;
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Session created successfully."), false);
+	if (!bWasSuccessful)
+	{
+		OnSessionError.Broadcast(TEXT("Failed to create session"), false);
+		return;
+	}
 
 	FString URL = FString::Printf(TEXT("%s?listen"), *GAME_MAP_PATH);
 	GetWorld()->ServerTravel(URL, true);
@@ -138,26 +178,21 @@ void USteamMultiplayerSubsystem::OnDestroySessionComplete(FName SessionName, boo
 	if (!bWasSuccessful)
 	{
 		OnSessionError.Broadcast(TEXT("Failed to destroy existing session"), false);
-		UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
-		// Still try to create new session even if destroy failed
 	}
 
 	if (bCreateSessionAfterDestroy)
 	{
 		bCreateSessionAfterDestroy = false;
-		CreateSession(DesiredSessionName);
+		CreateSession();
 	}
 }
 
 void USteamMultiplayerSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("OnFindSessionsComplete called"), false);
-
 	if (!bWasSuccessful)
 	{
 		OnSessionError.Broadcast(TEXT("Failed to find sessions. Check your connection."), false);
-		UE_LOG(LogTemp, Warning, TEXT("Session search failed"));
-		OnFindSessionsCompleted.Broadcast(TArray<USessionData*>()); // Broadcast empty array
+		OnFindSessionsCompleted.Broadcast(TArray<USessionData*>());
 		return;
 	}
 
@@ -167,7 +202,7 @@ void USteamMultiplayerSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 		return;
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Processing found sessions"), false);
+	// TODO: Figure out how to separate games of friends
 
 	TArray<USessionData*> Sessions;
 
@@ -178,8 +213,6 @@ void USteamMultiplayerSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 		Sessions.Add(SessionData);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Found %d sessions"), Sessions.Num());
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Found sessions: " + FString::FromInt(Sessions.Num())), false);
 	OnFindSessionsCompleted.Broadcast(Sessions);
 }
 
@@ -208,7 +241,7 @@ void USteamMultiplayerSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoi
 				break;
 		}
 		OnSessionError.Broadcast(ErrorMsg, false);
-		UE_LOG(LogTemp, Error, TEXT("Join session failed: %s"), *ErrorMsg);
+		UE_LOG(LogSteamMultiplayer, Error, TEXT("Join session failed: %s"), *ErrorMsg);
 		return;
 	}
 
@@ -223,7 +256,7 @@ void USteamMultiplayerSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoi
 	{
 		const FString ErrorMsg = TEXT("Failed to get server address");
 		OnSessionError.Broadcast(ErrorMsg, true);
-		UE_LOG(LogTemp, Error, TEXT("%s"), *ErrorMsg);
+		UE_LOG(LogSteamMultiplayer, Error, TEXT("%s"), *ErrorMsg);
 		return;
 	}
 

@@ -26,6 +26,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UButton> ContinueButton;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UButton> InviteFriendsButton;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UButton> MainMenuButton;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UButton> QuitGameButton;
@@ -33,6 +35,8 @@ protected:
 private:
 	UFUNCTION()
 	void OnContinueButtonClicked();
+	UFUNCTION()
+	void OnInviteFriendsButtonClicked();
 	UFUNCTION()
 	void OnMainMenuButtonClicked();
 	UFUNCTION()

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MultiplayerTemplate/GameFramework/Enums.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "SteamMultiplayerSubsystem.generated.h"
@@ -26,16 +27,18 @@ class USteamMultiplayerSubsystem : public UGameInstanceSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	void HostSession(FString SessionName);
+	void HostSession(FString SessionName, ESessionVisibility Visibility);
 	void FindSessions();
 	bool JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult);
 	bool LeaveSession();
+	void ShowInviteUI();
 
 	FOnFindSessionsComp OnFindSessionsCompleted;
 	FOnSessionError OnSessionError;
 
 private:
-	void CreateSession(FString SessionName);
+	void CreateSession();
+	FOnlineSessionSettings MakeSessionSettings(ESessionVisibility Visibility, int32 MaxPlayers);
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
@@ -46,5 +49,6 @@ private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	FString DesiredSessionName;
+	ESessionVisibility DesiredSessionVisibility = ESessionVisibility::Public;
 	bool bCreateSessionAfterDestroy = false;
 };

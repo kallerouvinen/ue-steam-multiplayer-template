@@ -23,6 +23,7 @@ void UPauseMenu::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	ContinueButton->OnClicked.AddDynamic(this, &ThisClass::OnContinueButtonClicked);
+	InviteFriendsButton->OnClicked.AddDynamic(this, &ThisClass::OnInviteFriendsButtonClicked);
 	MainMenuButton->OnClicked.AddDynamic(this, &ThisClass::OnMainMenuButtonClicked);
 	QuitGameButton->OnClicked.AddDynamic(this, &ThisClass::OnQuitGameButtonClicked);
 }
@@ -32,6 +33,17 @@ void UPauseMenu::OnContinueButtonClicked()
 	if (AMultiplayerTemplatePlayerController* PC = Cast<AMultiplayerTemplatePlayerController>(GetOwningPlayer()))
 	{
 		PC->TogglePauseMenu();
+	}
+}
+
+void UPauseMenu::OnInviteFriendsButtonClicked()
+{
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (USteamMultiplayerSubsystem* Subsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
+		{
+			Subsystem->ShowInviteUI();
+		}
 	}
 }
 
