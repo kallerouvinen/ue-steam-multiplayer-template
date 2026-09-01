@@ -3,7 +3,7 @@
 #include "MultiplayerTemplate/MainMenu/JoinGame/JoinGameWidget.h"
 #include "MultiplayerTemplate/GameFramework/SessionData.h"
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
-#include "MultiplayerTemplate/UI/ConfirmationDialog.h"
+#include "MultiplayerTemplate/UI/MessageDialog.h"
 #include "Components/Button.h"
 #include "Components/CircularThrobber.h"
 #include "Components/ListView.h"
@@ -11,10 +11,10 @@
 UJoinGameWidget::UJoinGameWidget(const FObjectInitializer& ObjectInitializer)
 		: Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UConfirmationDialog> ConfirmationDialogClassFinder(TEXT("/Game/UI/WBP_ConfirmationDialog"));
-	if (ConfirmationDialogClassFinder.Succeeded())
+	static ConstructorHelpers::FClassFinder<UMessageDialog> MessageDialogClassFinder(TEXT("/Game/UI/WBP_MessageDialog"));
+	if (MessageDialogClassFinder.Succeeded())
 	{
-		ConfirmationDialogClass = ConfirmationDialogClassFinder.Class;
+		MessageDialogClass = MessageDialogClassFinder.Class;
 	}
 }
 
@@ -117,13 +117,14 @@ void UJoinGameWidget::OnFindSessionsCompleted(TArray<USessionData*> SessionData)
 
 void UJoinGameWidget::OnSessionError(const FString& ErrorMessage, bool bIsCritical)
 {
-	UConfirmationDialog* Dialog = CreateWidget<UConfirmationDialog>(this, ConfirmationDialogClass);
+	if (!MessageDialogClass) return;
+
+	UMessageDialog* Dialog = CreateWidget<UMessageDialog>(this, MessageDialogClass);
 
 	Dialog->SetupDialog(
 			FText::FromString("Error"),
 			FText::FromString(ErrorMessage),
-			FText::FromString("OK"),
-			FText::FromString("Cancel"));
+			FMessageDialogButton(FText::FromString("OK")));
 
 	Dialog->AddToViewport();
 }

@@ -8,7 +8,7 @@
 
 class UButton;
 class UCircularThrobber;
-class UConfirmationDialog;
+class UMessageDialog;
 class UListView;
 class USessionData;
 
@@ -54,5 +54,5 @@ private:
 	UFUNCTION()
 	void OnSessionError(const FString& ErrorMessage, bool bIsCritical);
 
-	TSubclassOf<UConfirmationDialog> ConfirmationDialogClass;
+	TSubclassOf<UMessageDialog> MessageDialogClass;
 };

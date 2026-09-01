@@ -7,7 +7,7 @@
 #include "PauseMenu.generated.h"
 
 class UButton;
-class UConfirmationDialog;
+class UMessageDialog;
 
 /**
  *
@@ -40,5 +40,5 @@ private:
 
 	void LeaveSession();
 
-	TSubclassOf<UConfirmationDialog> ConfirmationDialogClass;
+	TSubclassOf<UMessageDialog> MessageDialogClass;
 };

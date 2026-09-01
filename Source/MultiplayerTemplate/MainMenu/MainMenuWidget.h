@@ -7,7 +7,7 @@
 #include "MainMenuWidget.generated.h"
 
 class UButton;
-// class UConfirmationDialog;
+class UMessageDialog;
 class UJoinGameWidget;
 class UHostGameWidget;
 
@@ -43,5 +43,5 @@ private:
 	TSubclassOf<UHostGameWidget> HostGameWidgetClass;
 	TSubclassOf<UJoinGameWidget> JoinGameWidgetClass;
 
-	// TSubclassOf<UConfirmationDialog> ConfirmationDialogClass;
+	TSubclassOf<UMessageDialog> MessageDialogClass;
 };

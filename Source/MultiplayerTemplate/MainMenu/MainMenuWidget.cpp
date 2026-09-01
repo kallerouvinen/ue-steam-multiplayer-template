@@ -3,7 +3,7 @@
 #include "MultiplayerTemplate/MainMenu/MainMenuWidget.h"
 #include "MultiplayerTemplate/MainMenu/HostGame/HostGameWidget.h"
 #include "MultiplayerTemplate/MainMenu/JoinGame/JoinGameWidget.h"
-// #include "MultiplayerTemplate/UI/ConfirmationDialog.h"
+#include "MultiplayerTemplate/UI/MessageDialog.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -22,11 +22,11 @@ UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer)
 		JoinGameWidgetClass = JoinGameWidgetClassFinder.Class;
 	}
 
-	// static ConstructorHelpers::FClassFinder<UConfirmationDialog> ConfirmationDialogClassFinder(TEXT("/Game/UI/WBP_ConfirmationDialog"));
-	// if (ConfirmationDialogClassFinder.Succeeded())
-	// {
-	// 	ConfirmationDialogClass = ConfirmationDialogClassFinder.Class;
-	// }
+	static ConstructorHelpers::FClassFinder<UMessageDialog> MessageDialogClassFinder(TEXT("/Game/UI/WBP_MessageDialog"));
+	if (MessageDialogClassFinder.Succeeded())
+	{
+		MessageDialogClass = MessageDialogClassFinder.Class;
+	}
 }
 
 void UMainMenuWidget::NativeOnInitialized()
@@ -52,28 +52,21 @@ void UMainMenuWidget::OnJoinGameButtonClicked()
 
 void UMainMenuWidget::OnQuitGameButtonClicked()
 {
-	UKismetSystemLibrary::QuitGame(
-			GetWorld(),
-			GetOwningPlayer(),
-			EQuitPreference::Quit,
-			false);
+	if (!MessageDialogClass) return;
 
-	// if (!ConfirmationDialogClass) return;
+	UMessageDialog* Dialog = CreateWidget<UMessageDialog>(this, MessageDialogClass);
 
-	// UConfirmationDialog* Dialog = CreateWidget<UConfirmationDialog>(this, ConfirmationDialogClass);
+	Dialog->SetupDialog(
+			FText::FromString("Quit Game"),
+			FText::FromString("Are you sure you want to quit the game?"),
+			FMessageDialogButton(FText::FromString("Yes"), [this]() {
+				UKismetSystemLibrary::QuitGame(
+						GetWorld(),
+						GetOwningPlayer(),
+						EQuitPreference::Quit,
+						false);
+			}),
+			FMessageDialogButton(FText::FromString("No")));
 
-	// Dialog->SetupDialog(
-	// 		FText::FromString("Quit Game"),
-	// 		FText::FromString("Are you sure you want to quit the game?"),
-	// 		FText::FromString("Yes"),
-	// 		FText::FromString("No"),
-	// 		[this]() {
-	// 			UKismetSystemLibrary::QuitGame(
-	// 					GetWorld(),
-	// 					GetOwningPlayer(),
-	// 					EQuitPreference::Quit,
-	// 					false);
-	// 		});
-
-	// Dialog->AddToViewport();
+	Dialog->AddToViewport();
 }
