@@ -29,30 +29,29 @@ No other online subsystem is supported.
 ## Supported Features
 
 <!-- TODO: Combine sections Hosting and Joining as they are basically duplicate information -->
-### Hosting
+
+### Session types
 
 A player can host a session as:
 
-- **Public** — discoverable through the session browser
-- **Friends Only** — friends can find/join the session
-- **Invite Only** — players can join through Steam invitations
+- **Public** — Discoverable through the session browser
+- **Friends Only** — Friends can join the session
+- **Invite Only** — Players can only join through Steam invitations
 
-### Joining
-
-Players can join through:
-
-- **Session browser**
-- Accepting a **Steam overlay invite**
-- Selecting **Join Game** directly from a friend's Steam profile/overlay
+> **NOTE**: Due to limitations of Steam, the following restrictions apply:
+>
+> - **Friends only** -games don't appear in found sessions. To add friend sessions to some kind of session browser, you have to iterate through friends separately and check whether they have a hosted session ongoing.
+> - For some reason, friends can't be invited to **Invite only** -games through Steam overlay. For this you have to open a separate Invite-overlay by calling `USteamMultiplayerSubsystem::ShowInviteUI()`.
 
 ## Configuration
 
 1. Enable `Steam Sockets`-plugin and restart the engine.
 
 <!-- TODO: Is PrivateDependencyModuleNames enough? -->
+
 1. Add the following dependencies under `PublicDependencyModuleNames` in `[PROJECT_NAME].Build.cs`-file:
-    1. `OnlineSubsystem`
-    1. `OnlineSubsystemUtils` (TODO: Is this needed?)
+   1. `OnlineSubsystem`
+   1. `OnlineSubsystemUtils` (TODO: Is this needed?)
 
 1. Add the following line in `[PROJECT_NAME].Build.cs`-file: `DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");`
 

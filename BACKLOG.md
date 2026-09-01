@@ -1,6 +1,5 @@
 # Backlog
 
-- Make session visibility have effect
 - Add notification for disconnections
 - Add dialog for clients when they are returned to main menu after host has disconnected
   - Host leaves (Implement delegate)
@@ -8,6 +7,8 @@
 - Add brief instructions to Readme about the steps needed to make Steam multiplayer work in user's own projects using this repo
 
 ## Consider to do
+
+Stuff I'm considering to implement, but are not promised.
 
 - Kicking players
 - Banning players
