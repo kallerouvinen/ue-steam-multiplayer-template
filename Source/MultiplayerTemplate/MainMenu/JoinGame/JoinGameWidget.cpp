@@ -3,6 +3,7 @@
 #include "MultiplayerTemplate/MainMenu/JoinGame/JoinGameWidget.h"
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/MainMenu/JoinGame/SessionData.h"
+#include "MultiplayerTemplate/UI/ConfirmationDialog.h"
 // #include "OnlineSessionSettings.h"
 #include "Components/Button.h"
 #include "Components/CircularThrobber.h"
@@ -11,6 +12,11 @@
 UJoinGameWidget::UJoinGameWidget(const FObjectInitializer& ObjectInitializer)
 		: Super(ObjectInitializer)
 {
+	static ConstructorHelpers::FClassFinder<UConfirmationDialog> ConfirmationDialogClassFinder(TEXT("/Game/UI/WBP_ConfirmationDialog"));
+	if (ConfirmationDialogClassFinder.Succeeded())
+	{
+		ConfirmationDialogClass = ConfirmationDialogClassFinder.Class;
+	}
 }
 
 void UJoinGameWidget::NativeOnInitialized()
@@ -37,6 +43,7 @@ void UJoinGameWidget::NativeConstruct()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("SteamMultiplayerSubsystem found and bound to OnFindSessionsCompleted"), false);
 
 	Subsystem->OnFindSessionsCompleted.AddDynamic(this, &ThisClass::OnFindSessionsCompleted);
+	Subsystem->OnSessionError.AddDynamic(this, &ThisClass::OnSessionError);
 
 	OnRefreshButtonClicked();
 }
@@ -47,6 +54,7 @@ void UJoinGameWidget::NativeDestruct()
 	if (Subsystem)
 	{
 		Subsystem->OnFindSessionsCompleted.RemoveAll(this);
+		Subsystem->OnSessionError.RemoveAll(this);
 	}
 
 	Super::NativeDestruct();
@@ -128,4 +136,23 @@ void UJoinGameWidget::OnFindSessionsCompleted(TArray<USessionData*> SessionData)
 	// }
 
 	SessionList->SetListItems(SessionData);
+}
+
+void UJoinGameWidget::OnSessionError(const FString& ErrorMessage, bool bIsCritical)
+{
+	UConfirmationDialog* Dialog = CreateWidget<UConfirmationDialog>(this, ConfirmationDialogClass);
+
+	Dialog->SetupDialog(
+			FText::FromString("Error"),
+			FText::FromString(ErrorMessage),
+			FText::FromString("OK"),
+			FText::FromString("Cancel"));
+
+	Dialog->AddToViewport();
+
+	// UE_LOG(LogTemp, Error, TEXT("Session error: %s"), *ErrorMessage);
+	// if (bIsCritical)
+	// {
+	// 	// Handle critical error, e.g., show a message to the user or navigate back to the main menu
+	// }
 }

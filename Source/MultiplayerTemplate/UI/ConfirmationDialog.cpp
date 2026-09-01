@@ -10,13 +10,26 @@ void UConfirmationDialog::SetupDialog(FText InTitle, FText InMessage, FText InCo
 	Description->SetText(InMessage);
 
 	ConfirmLabel->SetText(InConfirmText);
-	CancelLabel->SetText(InCancelText);
+
+	if (InCancelText.IsEmpty())
+	{
+		CancelButton->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		CancelLabel->SetText(InCancelText);
+	}
 
 	ConfirmButton->OnClicked.AddDynamic(this, &ThisClass::OnConfirmButtonClicked);
 	CancelButton->OnClicked.AddDynamic(this, &ThisClass::OnCancelButtonClicked);
 
 	OnConfirm = InOnConfirm;
 	OnCancel = InOnCancel;
+}
+
+void UConfirmationDialog::SetupDialog(FText InTitle, FText InMessage, FText InConfirmText, TFunction<void()> InOnConfirm)
+{
+	SetupDialog(InTitle, InMessage, InConfirmText, FText::GetEmpty(), InOnConfirm, 0);
 }
 
 void UConfirmationDialog::OnConfirmButtonClicked()

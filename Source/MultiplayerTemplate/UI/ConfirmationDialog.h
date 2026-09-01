@@ -18,7 +18,8 @@ class UConfirmationDialog : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetupDialog(FText InTitle, FText InMessage, FText InConfirmText, FText InCancelText, TFunction<void()> InOnConfirm, TFunction<void()> InOnCancel = 0);
+	void SetupDialog(FText InTitle, FText InMessage, FText InConfirmText, FText InCancelText, TFunction<void()> InOnConfirm = 0, TFunction<void()> InOnCancel = 0);
+	void SetupDialog(FText InTitle, FText InMessage, FText InConfirmText, TFunction<void()> InOnConfirm = 0);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))

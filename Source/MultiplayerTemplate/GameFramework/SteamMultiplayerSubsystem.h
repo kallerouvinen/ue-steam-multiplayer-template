@@ -12,7 +12,7 @@ class USessionData;
 DECLARE_LOG_CATEGORY_EXTERN(LogSteamMultiplayer, Log, All);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindSessionsComp, TArray<USessionData*>, SessionData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSessionError, FString, ErrorMessage, bool, bIsCritical);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSessionError, const FString&, ErrorMessage, bool, bIsCritical);
 
 /**
  * Steam Multiplayer Subsystem
@@ -29,6 +29,7 @@ public:
 	void HostSession(FString SessionName);
 	void FindSessions();
 	bool JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult);
+	bool LeaveSession();
 
 	FOnFindSessionsComp OnFindSessionsCompleted;
 	FOnSessionError OnSessionError;
@@ -45,4 +46,5 @@ private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	FString DesiredSessionName;
+	bool bCreateSessionAfterDestroy = false;
 };

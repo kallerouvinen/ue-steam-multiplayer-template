@@ -8,6 +8,7 @@
 
 class UButton;
 class UCircularThrobber;
+class UConfirmationDialog;
 class UListView;
 class USessionData;
 
@@ -50,4 +51,8 @@ private:
 
 	UFUNCTION()
 	void OnFindSessionsCompleted(TArray<USessionData*> SessionData);
+	UFUNCTION()
+	void OnSessionError(const FString& ErrorMessage, bool bIsCritical);
+
+	TSubclassOf<UConfirmationDialog> ConfirmationDialogClass;
 };

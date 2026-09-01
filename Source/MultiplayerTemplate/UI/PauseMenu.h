@@ -38,5 +38,7 @@ private:
 	UFUNCTION()
 	void OnQuitGameButtonClicked();
 
+	void LeaveSession();
+
 	TSubclassOf<UConfirmationDialog> ConfirmationDialogClass;
 };

@@ -2,6 +2,7 @@
 
 #include "MultiplayerTemplate/UI/PauseMenu.h"
 #include "MultiplayerTemplate/GameFramework/MultiplayerTemplatePlayerController.h"
+#include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/UI/ConfirmationDialog.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
@@ -43,8 +44,10 @@ void UPauseMenu::OnMainMenuButtonClicked()
 			FText::FromString("Are you sure you want to return to the main menu?"),
 			FText::FromString("Yes"),
 			FText::FromString("No"),
-			// TODO: Do we need to do anything else when leaving the game, such as destroy session
-			[this]() { UGameplayStatics::OpenLevel(GetWorld(), "MainMenu"); });
+			[this]() {
+				LeaveSession();
+				UGameplayStatics::OpenLevel(GetWorld(), "MainMenu");
+			});
 
 	Dialog->AddToViewport();
 }
@@ -59,6 +62,7 @@ void UPauseMenu::OnQuitGameButtonClicked()
 			FText::FromString("Yes"),
 			FText::FromString("No"),
 			[this]() {
+				LeaveSession();
 				UKismetSystemLibrary::QuitGame(
 						GetWorld(),
 						GetOwningPlayer(),
@@ -67,4 +71,15 @@ void UPauseMenu::OnQuitGameButtonClicked()
 			});
 
 	Dialog->AddToViewport();
+}
+
+void UPauseMenu::LeaveSession()
+{
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (USteamMultiplayerSubsystem* Subsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
+		{
+			Subsystem->LeaveSession();
+		}
+	}
 }
