@@ -25,7 +25,6 @@ public class MultiplayerTemplate : ModuleRules
 			// "OnlineSubsystemUtils",
 			"Slate",
 			"StateTreeModule",
-			// "SteamSockets",
 			"UMG",
 		});
 
