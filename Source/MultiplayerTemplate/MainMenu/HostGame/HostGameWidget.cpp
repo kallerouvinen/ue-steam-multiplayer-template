@@ -4,7 +4,7 @@
 #include "MultiplayerTemplate/Constants.h"
 #include "MultiplayerTemplate/GameFramework/MultiplayerTemplateGameInstance.h"
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
-#include "MultiplayerTemplate/MainMenu/HostGame/CarouselSelector.h"
+#include "MultiplayerTemplate/UI/CarouselSelector.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
 #include "Components/TextBlock.h"
@@ -41,8 +41,6 @@ void UHostGameWidget::OnStartGameButtonClicked()
 {
 	ESessionVisibility SessionVisibility = GetSelectedSessionVisibility();
 
-	// UGameplayStatics::OpenLevel(this, FName(TEXT("DefaultMap")));
-
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
 		if (USteamMultiplayerSubsystem* SteamMPSubsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
@@ -51,14 +49,6 @@ void UHostGameWidget::OnStartGameButtonClicked()
 			SteamMPSubsystem->HostSession(GameNameInput->GetText().ToString());
 		}
 	}
-
-	// if (UMultiplayerTemplateGameInstance* GameInstance = GetGameInstance<UMultiplayerTemplateGameInstance>())
-	// {
-	// 	// TArray<FSessionPropertyKeyPair> Settings;
-	// 	// Settings.Add(FSessionPropertyKeyPair{ SESSION_NAME_SETTINGS_KEY, FVariantData(GameNameInput->GetText().ToString()) });
-
-	// 	// GameInstance->CreateSession(Settings);
-	// }
 }
 
 void UHostGameWidget::OnBackButtonClicked()

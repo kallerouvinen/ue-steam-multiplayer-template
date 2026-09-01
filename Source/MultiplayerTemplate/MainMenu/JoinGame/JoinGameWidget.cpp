@@ -1,10 +1,9 @@
 // Copyright 2026 Kalle Rouvinen. All Rights Reserved.
 
 #include "MultiplayerTemplate/MainMenu/JoinGame/JoinGameWidget.h"
+#include "MultiplayerTemplate/GameFramework/SessionData.h"
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
-#include "MultiplayerTemplate/MainMenu/JoinGame/SessionData.h"
 #include "MultiplayerTemplate/UI/ConfirmationDialog.h"
-// #include "OnlineSessionSettings.h"
 #include "Components/Button.h"
 #include "Components/CircularThrobber.h"
 #include "Components/ListView.h"
@@ -40,8 +39,6 @@ void UJoinGameWidget::NativeConstruct()
 	USteamMultiplayerSubsystem* Subsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>();
 	if (!Subsystem) return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("SteamMultiplayerSubsystem found and bound to OnFindSessionsCompleted"), false);
-
 	Subsystem->OnFindSessionsCompleted.AddDynamic(this, &ThisClass::OnFindSessionsCompleted);
 	Subsystem->OnSessionError.AddDynamic(this, &ThisClass::OnSessionError);
 
@@ -62,8 +59,6 @@ void UJoinGameWidget::NativeDestruct()
 
 void UJoinGameWidget::OnSessionSelectionChanged(UObject* ListItemObject)
 {
-	// TODO: Remove when not needed
-	UE_LOG(LogTemp, Warning, TEXT("OnSessionSelectionChanged"));
 	JoinButton->SetIsEnabled(ListItemObject != nullptr);
 }
 
@@ -110,30 +105,12 @@ void UJoinGameWidget::OnBackButtonClicked()
 
 void UJoinGameWidget::OnFindSessionsCompleted(TArray<USessionData*> SessionData)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("OnFindSessionsCompleted called"));
-	UE_LOG(LogTemp, Warning, TEXT("OnFindSessionsCompleted called"));
-	// TODO: Handle failures also and inform the user that the session search failed
-
 	// TODO: Show Message.Results.Num() somewhere in the window
+	// TODO: Select one of the results?
 
 	Loader->SetVisibility(ESlateVisibility::Collapsed);
 	// JoinButton->SetIsEnabled(true);
 	RefreshButton->SetIsEnabled(true);
-
-	// TArray<USessionData*> Sessions;
-
-	// for (const USessionData* Session : SessionData)
-	// {
-	// 	if (Session->GetSearchResult().IsValid())
-	// 	{
-	// // void SetSearchResult(const FOnlineSessionSearchResult& InSearchResult) { SearchResult = InSearchResult; }
-	// // FOnlineSessionSearchResult GetSearchResult() const { return SearchResult; }
-
-	// 		USessionData* NewSessionData = NewObject<USessionData>();
-	// 		NewSessionData->SetSearchResult(Session);
-	// 		Sessions.Add(NewSessionData);
-	// 	}
-	// }
 
 	SessionList->SetListItems(SessionData);
 }
@@ -149,10 +126,4 @@ void UJoinGameWidget::OnSessionError(const FString& ErrorMessage, bool bIsCritic
 			FText::FromString("Cancel"));
 
 	Dialog->AddToViewport();
-
-	// UE_LOG(LogTemp, Error, TEXT("Session error: %s"), *ErrorMessage);
-	// if (bIsCritical)
-	// {
-	// 	// Handle critical error, e.g., show a message to the user or navigate back to the main menu
-	// }
 }

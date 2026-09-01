@@ -2,7 +2,7 @@
 
 #include "MultiplayerTemplate/MainMenu/JoinGame/SessionListEntry.h"
 #include "MultiplayerTemplate/Constants.h"
-#include "MultiplayerTemplate/MainMenu/JoinGame/SessionData.h"
+#include "MultiplayerTemplate/GameFramework/SessionData.h"
 #include "Components/TextBlock.h"
 
 void USessionListEntry::NativeOnListItemObjectSet(UObject* ListItemObject)

@@ -1,6 +1,6 @@
 // Copyright 2026 Kalle Rouvinen. All Rights Reserved.
 
-#include "MultiplayerTemplate/MainMenu/HostGame/CarouselSelector.h"
+#include "MultiplayerTemplate/UI/CarouselSelector.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 

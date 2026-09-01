@@ -2,7 +2,7 @@
 
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/Constants.h"
-#include "MultiplayerTemplate/MainMenu/JoinGame/SessionData.h"
+#include "MultiplayerTemplate/GameFramework/SessionData.h"
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
@@ -112,7 +112,6 @@ void USteamMultiplayerSubsystem::CreateSession(FString SessionName)
 			SessionSettings.Set(
 					SESSION_NAME_SETTINGS_KEY,
 					DesiredSessionName,
-					// EOnlineDataAdvertisementType::ViaOnlineService
 					EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 		}
 
