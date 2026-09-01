@@ -2,7 +2,6 @@
 
 #include "MultiplayerTemplate/MainMenu/HostGame/HostGameWidget.h"
 #include "MultiplayerTemplate/Constants.h"
-#include "MultiplayerTemplate/GameFramework/MultiplayerTemplateGameInstance.h"
 #include "MultiplayerTemplate/GameFramework/SteamMultiplayerSubsystem.h"
 #include "MultiplayerTemplate/UI/CarouselSelector.h"
 #include "Components/Button.h"

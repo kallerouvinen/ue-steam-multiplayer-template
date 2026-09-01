@@ -57,9 +57,8 @@ void USteamMultiplayerSubsystem::FindSessions()
 	{
 		SessionSearch->MaxSearchResults = 1000;
 		// SessionSearch->QuerySettings.Set(SEARCH_KEYWORDS, FString(""), EOnlineComparisonOp::Equals);
-		// Examples of setting search parameters
-		// SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+		// Examples of setting search parameters
 		// SessionSearch->QuerySettings.Set(SETTING_MAPNAME, FString(), EOnlineComparisonOp::Equals);
 		// SessionSearch->QuerySettings.Set(SEARCH_DEDICATED_ONLY, false, EOnlineComparisonOp::Equals);
 		// SessionSearch->QuerySettings.Set(SEARCH_EMPTY_SERVERS_ONLY, false, EOnlineComparisonOp::Equals);
