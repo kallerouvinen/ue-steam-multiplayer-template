@@ -10,49 +10,76 @@ This is **not a complete game template** or project starter.
 
 It contains only:
 
-* Minimal main menu logic
-* The networking logic required to host and join games through Steam
-* The custom `GameInstance` responsible for the multiplayer/session flow
-* The required Steam/Online Subsystem configuration
+- Minimal main menu logic
+- The networking logic required to host and join games through Steam
+- The custom `GameInstanceSubsystem` responsible for the multiplayer/session flow
+- The required Steam/Online Subsystem configuration
+- Minimal gameplay logic for moving around with 3rd person mannequin
 
 Game-specific systems, gameplay, UI, maps, and other project setup are intentionally left out.
 
 ## Requirements
 
-* Unreal Engine 5.7
-* Online Subsystem Steam
-* Steam client
+- Unreal Engine 5.7
+- Online Subsystem Steam
+- Steam client
 
 No other online subsystem is supported.
 
 ## Supported Features
 
+<!-- TODO: Combine sections Hosting and Joining as they are basically duplicate information -->
 ### Hosting
 
 A player can host a session as:
 
-* **Public** — discoverable through the session browser
-* **Friends Only** — friends can find/join the session
-* **Invite Only** — players can join through Steam invitations
+- **Public** — discoverable through the session browser
+- **Friends Only** — friends can find/join the session
+- **Invite Only** — players can join through Steam invitations
 
 ### Joining
 
 Players can join through:
 
-* **Session browser**
-* Accepting a **Steam overlay invite**
-* Selecting **Join Game** directly from a friend's Steam profile/overlay
+- **Session browser**
+- Accepting a **Steam overlay invite**
+- Selecting **Join Game** directly from a friend's Steam profile/overlay
 
 ## Configuration
 
-The Steam setup is kept as minimal as possible and is primarily contained in:
+1. Enable `Steam Sockets`-plugin and restart the engine.
 
-```text
-Config/DefaultEngine.ini
-Config/DefaultGame.ini
+<!-- TODO: Is PrivateDependencyModuleNames enough? -->
+1. Add the following dependencies under `PublicDependencyModuleNames` in `[PROJECT_NAME].Build.cs`-file:
+    1. `OnlineSubsystem`
+    1. `OnlineSubsystemUtils` (TODO: Is this needed?)
+
+1. Add the following line in `[PROJECT_NAME].Build.cs`-file: `DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");`
+
+1. Add the following lines to `DefaultEngine.ini`:
+
+<!-- TODO: Copy the final config here once everything works -->
+
+```ini
+[/Script/Engine.GameEngine]
+!NetDriverDefinitions=ClearArray
++NetDriverDefinitions=(DefName="GameNetDriver",DriverClassName="/Script/SteamSockets.SteamSocketsNetDriver",DriverClassNameFallback="/Script/SteamSockets.SteamNetSocketsNetDriver")
+
+[OnlineSubsystem]
+DefaultPlatformService=Steam
+
+[OnlineSubsystemSteam]
+bEnabled=true
+SteamDevAppId=480
+; bUsesPresence=true
+; bUseLobbiesIfAvailable=true
+; ; If using Sessions
+
+[/Script/SteamSockets.SteamSocketsNetDriver]
+NetConnectionClassName="/Script/SteamSockets.SteamSocketsNetConnection"
 ```
 
-The exact configuration in this repository should be treated as the known-working baseline for **UE 5.7** rather than copied from older Unreal Engine/Steam tutorials.
+1. Copy required code for the custom game instance from `TODO`
 
 ## Purpose
 
