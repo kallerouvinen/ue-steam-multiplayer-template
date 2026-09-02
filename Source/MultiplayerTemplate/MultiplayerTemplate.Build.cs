@@ -14,7 +14,6 @@ public class MultiplayerTemplate : ModuleRules
 			"CoreUObject",
 		});
 
-		// TODO: Remove redundant modules from the dependency list
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 			"AIModule",
@@ -22,7 +21,6 @@ public class MultiplayerTemplate : ModuleRules
 			"EnhancedInput",
 			"InputCore",
 			"OnlineSubsystem",
-			// "OnlineSubsystemUtils",
 			"Slate",
 			"StateTreeModule",
 			"UMG",
