@@ -2,62 +2,83 @@
 
 A minimal reference project for **Steam multiplayer in Unreal Engine 5.7**.
 
-This repository exists because Unreal Engine's Steam multiplayer setup has seen breaking changes across recent engine versions, while existing documentation and tutorials have not always been updated to reflect those changes. The goal is to keep a known-working implementation that can be reused when starting a new project.
+This repository exists because Unreal Engine's Steam multiplayer setup has gone through breaking changes across recent engine versions, while existing documentation and tutorials have not always been updated to reflect those changes.
+
+The goal of this project is to provide a **known-working C++ implementation** that can be used as a reference when starting a new Unreal Engine multiplayer project.
+
+> **Note:** Blueprint support is currently not provided. This project is primarily intended as a C++ reference implementation.
 
 ## Scope
 
-This is **not a complete game template** or project starter.
+This repository is intended to be a **small, working reference project** that can be consulted when starting a new multiplayer project.
+
+It is **not** a complete game template or project starter.
 
 It contains only:
 
+- Steam session networking and configuration required to host and join games
 - Minimal main menu logic
-- The networking logic required to host and join games through Steam
-- The custom `GameInstanceSubsystem` responsible for the multiplayer/session flow
-- The required Steam/Online Subsystem configuration
-- Minimal gameplay logic for moving around with 3rd person mannequin
+- Minimal gameplay logic
+- Third-person mannequin movement
 
-Game-specific systems, gameplay, UI, maps, and other project setup are intentionally left out.
+Features outside the scope of this project may be added in the future, but are intentionally kept to a minimum for now.
 
 ## Requirements
 
-- Unreal Engine 5.7
-- Online Subsystem Steam
+- Unreal Engine **5.7**
+- **Online Subsystem Steam**
+- **Steam Sockets** plugin
 - Steam client
 
-No other online subsystem is supported.
+Steam must be running when testing the project.
 
-## Supported Features
+No other online subsystem is currently supported.
 
-<!-- TODO: Combine sections Hosting and Joining as they are basically duplicate information -->
+## Supported Session Types
 
-### Session types
+The project currently supports three session types:
 
-A player can host a session as:
+### Public
 
-- **Public** — Discoverable through the session browser
-- **Friends Only** — Friends can join the session
-- **Invite Only** — Players can only join through Steam invitations
+The session is publicly discoverable and can appear in the session browser.
 
-> **NOTE**: Due to limitations of Steam, the following restrictions apply:
+### Friends Only
+
+Only Steam friends can join the session.
+
+Friends-only sessions **do not appear in the normal session search results**. If you want to display friends' active sessions in a session browser, you must enumerate the player's Steam friends separately and check whether each friend has an active session.
+
+### Invite Only
+
+Players can only join through a Steam invitation.
+
+> **Known Steam limitation:** Friends cannot currently be invited to Invite Only sessions through the standard Friends List functionality in the Steam overlay.
 >
-> - **Friends only** -games don't appear in found sessions. To add friend sessions to some kind of session browser, you have to iterate through friends separately and check whether they have a hosted session ongoing.
-> - For some reason, friends can't be invited to **Invite only** -games through Steam overlay. For this you have to open a separate Invite-overlay by calling `USteamMultiplayerSubsystem::ShowInviteUI()`.
+> To send an invitation, use the separate Steam invite UI exposed through:
+>
+> `USteamMultiplayerSubsystem::ShowInviteUI()`
+>
+> Alternatively, a custom friend/invite UI can be implemented.
 
 ## Configuration
 
-1. Enable `Steam Sockets`-plugin and restart the engine.
+### 1. Enable Steam Sockets
 
-<!-- TODO: Is PrivateDependencyModuleNames enough? -->
+Enable the **Steam Sockets** plugin in Unreal Engine and restart the editor.
 
-1. Add the following dependencies under `PublicDependencyModuleNames` in `[PROJECT_NAME].Build.cs`-file:
-   1. `OnlineSubsystem`
-   1. `OnlineSubsystemUtils` (TODO: Is this needed?)
+### 2. Update `Build.cs`
 
-1. Add the following line in `[PROJECT_NAME].Build.cs`-file: `DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");`
+Add `OnlineSubsystem` to `PrivateDependencyModuleNames` in your project's `[PROJECT_NAME].Build.cs` file.
 
-1. Add the following lines to `DefaultEngine.ini`:
+Also add:
 
-<!-- TODO: Copy the final config here once everything works -->
+```cpp
+DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
+```
+
+### 3. Configure `DefaultEngine.ini`
+
+Add the following configuration:
 
 ```ini
 [/Script/Engine.GameEngine]
@@ -69,17 +90,62 @@ DefaultPlatformService=Steam
 
 [OnlineSubsystemSteam]
 bEnabled=true
-SteamDevAppId=480
-; bUsesPresence=true
-; bUseLobbiesIfAvailable=true
-; ; If using Sessions
+SteamDevAppId=480 ; 480 is Spacewar and can be used for testing. Replace with your own App ID when available.
 
 [/Script/SteamSockets.SteamSocketsNetDriver]
 NetConnectionClassName="/Script/SteamSockets.SteamSocketsNetConnection"
 ```
 
-1. Copy required code for the custom game instance from `TODO`
+### 4. Copy the multiplayer classes
 
-## Purpose
+Copy the following files into your project and modify them as needed:
 
-This repository is intended to be a small, working reference that can be copied or consulted when starting a new multiplayer project—not a framework to build the entire game from.
+```text
+SteamMultiplayerSubsystem.h
+SteamMultiplayerSubsystem.cpp
+SessionData.h
+Enums.h
+```
+
+## Testing
+
+To test Steam multiplayer:
+
+1. Start the Steam client.
+2. Build and launch the project.
+3. Start one instance as the host.
+4. Start another instance using a different Steam account.
+5. Host or join a session using the main menu.
+
+When testing multiple clients, make sure each client is running as a separate game instance rather than relying on a single shared PIE session, unless the particular test is known to work with PIE.
+
+## Project Structure
+
+The main Steam multiplayer implementation is contained in:
+
+```text
+Source/
+└── [ProjectName]/
+    ├── SteamMultiplayerSubsystem.h
+    ├── SteamMultiplayerSubsystem.cpp
+    ├── SessionData.h
+    └── Enums.h
+```
+
+The rest of the project exists primarily to provide a minimal environment in which the multiplayer implementation can be tested.
+
+## Known Limitations
+
+- Blueprint support is currently not provided.
+- Only Online Subsystem Steam is supported.
+- Friends-only sessions are not returned by normal session searches.
+- Invite-only sessions require `ShowInviteUI()` or a custom invitation UI.
+- This project is not intended to provide a complete matchmaking, lobby, or dedicated-server solution.
+
+## Contributing
+
+If Unreal Engine, Steam Sockets, or Online Subsystem Steam introduce changes that affect the implementation, contributions that keep the project working with the supported Unreal Engine version are welcome.
+
+## License
+
+See [LICENSE](LICENSE) for licensing information.

@@ -1,16 +1,20 @@
 # Backlog
 
-- Add notification for disconnections
-- Add dialog for clients when they are returned to main menu after host has disconnected
-  - Host leaves (Implement delegate)
-  - Client leaves (Implement delegate)
-- Add brief instructions to Readme about the steps needed to make Steam multiplayer work in user's own projects using this repo
+Potential features and improvements to consider based on future project requirements.
 
-## Consider to do
+These are not commitments or a fixed roadmap. Features will be implemented as needed.
 
-Stuff I'm considering to implement, but are not promised.
+## Distribution & Reusability
 
-- Kicking players
-- Banning players
-- Add delegate for clients leaving the game. This could be used for notifications to other players in-game.
-- Reconnecting to previous session in case of disconnect. Store session ID somewhere and if it exists when player is in main menu, show UI for reconnecting to the game
+- **Turn into a plugin**: Package the multiplayer subsystem as a reusable Unreal Engine plugin with a clean public API.
+
+## Session & Connection Handling
+
+- **Host disconnect dialog**: Inform clients when they are returned to the main menu because the host disconnected.
+- **Player join/leave delegate**: Expose a delegate for reacting to players joining or leaving the session, e.g. for in-game notifications.
+- **Session reconnect**: Offer players the option to reconnect to their previous session after an unexpected disconnect.
+
+## Player Management
+
+- **Kicking players**: Allow the host to remove a player from the session.
+- **Banning players**: Allow the host to prevent a player from rejoining the session.
