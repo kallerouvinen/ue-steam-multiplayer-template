@@ -22,6 +22,18 @@ void UHostGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	if (UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (USteamMultiplayerSubsystem* SteamMPSubsystem = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>())
+		{
+			const FString DefaultSessionName = GameInstance->GetSubsystem<USteamMultiplayerSubsystem>()->GetDefaultSessionName();
+			FText DefaultSessionNameText = FText::FromString(DefaultSessionName);
+			GameNameInput->SetText(DefaultSessionNameText);
+			OnGameNameTextChanged(DefaultSessionNameText);
+			return;
+		}
+	}
+
 	OnGameNameTextChanged(FText::GetEmpty());
 }
 

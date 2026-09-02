@@ -32,6 +32,8 @@ public:
 	bool JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult);
 	bool LeaveSession();
 	void ShowInviteUI();
+	FString GetPlayerName() const;
+	FString GetDefaultSessionName() const;
 
 	FOnFindSessionsComp OnFindSessionsCompleted;
 	FOnSessionError OnSessionError;

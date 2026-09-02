@@ -4,6 +4,7 @@
 #include "MultiplayerTemplate/Constants.h"
 #include "MultiplayerTemplate/GameFramework/SessionData.h"
 #include "Interfaces/OnlineExternalUIInterface.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
@@ -101,6 +102,28 @@ void USteamMultiplayerSubsystem::ShowInviteUI()
 			ExternalUI->ShowInviteUI(0, NAME_GameSession);
 		}
 	}
+}
+
+FString USteamMultiplayerSubsystem::GetPlayerName() const
+{
+	if (IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get())
+	{
+		if (IOnlineIdentityPtr IdentityInterface = OnlineSubsystem->GetIdentityInterface())
+		{
+			TSharedPtr<const FUniqueNetId> UserId = IdentityInterface->GetUniquePlayerId(0);
+			if (UserId.IsValid())
+			{
+				return IdentityInterface->GetPlayerNickname(*UserId);
+			}
+		}
+	}
+
+	return TEXT("<UNKNOWN>");
+}
+
+FString USteamMultiplayerSubsystem::GetDefaultSessionName() const
+{
+	return FString::Printf(TEXT("%s's Game"), *GetPlayerName());
 }
 
 void USteamMultiplayerSubsystem::CreateSession()
